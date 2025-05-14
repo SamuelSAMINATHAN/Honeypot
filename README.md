@@ -170,5 +170,3 @@ curl -X POST -d "user=admin&pass=admin" http://localhost:8080/login
 # FTP Honeypot
 ftp localhost 2121
 
-
-# Honeypot
