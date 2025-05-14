@@ -1,0 +1,6 @@
+paramiko
+Flask
+pyftpdlib
+streamlit
+streamlit-autorefresh
+rich 

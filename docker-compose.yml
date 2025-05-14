@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  honeypot:
+    build: .
+    container_name: honeypot_app
+    ports:
+      # Format: <port_hote>:<port_conteneur>
+      # Vous pouvez changer les ports hôtes si les ports par défaut sont déjà utilisés
+      - "2222:2222"    # SSH
+      - "8080:8080"    # HTTP
+      - "2121:2121"    # FTP Control
+      - "60000-60010:60000-60010" # FTP Passive Ports
+    volumes:
+      # Monter le répertoire des logs pour la persistance et l'accès depuis l'hôte
+      - ./logs:/app/logs
+      # Monter le fichier de configuration pour des modifications faciles
+      - ./config/honeypot_config.json:/app/config/honeypot_config.json:ro # ro = read-only
+      # Monter une clé SSH existante si vous en avez une (optionnel)
+      # - ./server_key:/app/server_key:ro 
+    restart: unless-stopped
+    networks:
+      - honeypot_net
+
+  dashboard:
+    # On utilise une image python de base et on installe les dépendances
+    # car le dashboard n'a besoin que de streamlit et pandas (déjà dans requirements)
+    build:
+      context: .
+      dockerfile: Dockerfile # On peut réutiliser le même Dockerfile car il installe tout
+    container_name: honeypot_dashboard
+    command: streamlit run dashboard/web_ui.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501" # Port par défaut de Streamlit
+    volumes:
+      # Monter les logs pour que le dashboard puisse les lire
+      - ./logs:/app/logs:ro
+      # Monter le code du dashboard et la config pour les mises à jour sans rebuild
+      - ./dashboard:/app/dashboard:ro
+      - ./config/honeypot_config.json:/app/config/honeypot_config.json:ro
+    depends_on:
+      - honeypot # S'assurer que le honeypot démarre (pas une garantie fonctionnelle, juste ordre)
+    restart: unless-stopped
+    networks:
+      - honeypot_net
+
+networks:
+  honeypot_net:
+    driver: bridge 

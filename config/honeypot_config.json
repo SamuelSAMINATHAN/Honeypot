@@ -1,0 +1,14 @@
+{
+  "enable_ssh": true,
+  "enable_http": true,
+  "enable_ftp": true,
+  "ssh_host": "0.0.0.0",
+  "ssh_port": 2222,
+  "http_host": "0.0.0.0",
+  "http_port": 8080,
+  "ftp_host": "0.0.0.0",
+  "ftp_port": 2121,
+  "ftp_root": "ftp_trap_dir",         
+  "log_directory": "logs",
+  "log_file_prefix": "honeypot"
+}
